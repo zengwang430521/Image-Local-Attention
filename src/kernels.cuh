@@ -41,6 +41,54 @@ __global__ void cc2k(
     }
 }
 
+
+
+
+template<typename dt, typename dtc>
+__global__ void my_cc2k(
+        const dt *query,
+        const dt *key,
+        const int *idx,
+        const int Nquery,
+        const int Nkey,
+        const int kernel,
+        const int channels,
+        dt *y
+) {
+    // query: {Nquery, c}
+    // key: {Nkey, c}
+    // idx: {Nquery, kernel}
+    // y: {Nquery, kernel}
+
+    for (int indexO = blockIdx.x; indexO < per_channel; indexO += gridDim.x) {
+
+
+        const int w_ori = indexO % width - rW;
+        const int h_ori = indexO / width - rH;
+
+        KERNEL_LOOP(indexK, patch) {
+            const int w = w_ori + indexK % kW;
+            const int h = h_ori + indexK / kW;
+            dtc val = dtc(0);
+
+            if (h > -1 && h < height && w > -1 && w < width) {
+                const dt *p_ori = x_ori + indexO;
+                const dt *p_loc = x_loc + h * width + w;
+                for (int c = 0; c < channels; ++c) {
+                    val += static_cast<dtc> (__ldg(p_ori) * __ldg(p_loc));
+                    p_ori += per_channel;
+                    p_loc += per_channel;
+                }
+            }
+            y[indexO * patch + indexK] = static_cast<dt> (val);
+        }
+    }
+}
+
+
+
+
+
 template<typename dt, typename dtc>
 __global__ void ck2c_ori(
         const dt *x_loc,

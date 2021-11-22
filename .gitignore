@@ -1,0 +1,6 @@
+build
+*.pyc
+.iead
+dist
+log
+*-info

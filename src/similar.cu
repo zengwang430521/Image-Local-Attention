@@ -90,3 +90,32 @@ torch::Tensor similar_cuda_backward(
     }
     return grad_inp;
 }
+
+
+
+////////////////////////////////////////////////////////////////////
+
+torch::Tensor distance_cuda_forward(
+        const torch::Tensor &query,
+        const torch::Tensor &key,
+        const torch::Tensor &idx
+) {
+    TypeCheck(query);
+    TypeCheck(key);
+    const int batch = query.size(0);
+    const int Nquery = query.size(1);
+    const int channels = query.size(2);
+    const int Nkey = key.size(1);
+    const int kernel = idx.size(2);
+    auto output = torch::empty({batch, Nquery, kernel}, query.options());
+
+    f_mydist<float, double>(
+            at::cuda::getCurrentCUDAStream(),
+            query.data_ptr<float>(),
+            key.data_ptr<float>(),
+            idx.data_ptr<int>(),
+            batch, Nquery, Nkey, kernel, channels,
+            output.data_ptr<float>()
+    );
+    return output;
+}

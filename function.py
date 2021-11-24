@@ -7,7 +7,9 @@ from localAttention import (similar_forward,
                             similar_backward,
                             weighting_forward,
                             weighting_backward_ori,
-                            weighting_backward_weight)
+                            weighting_backward_weight,
+                            distance_forward,
+                            )
 
 __all__ = ['f_similar', 'f_weighting', 'LocalAttention', 'TorchLocalAttention']
 
@@ -130,8 +132,18 @@ class TorchLocalAttention(nn.Module):
         out = self.f_weighting(x3, weight, self.kH, self.kW)
 
         return out
-    
-    
+
+
+class distanceFunction(Function):
+    @staticmethod
+    def forward(ctx, query, key, idx):
+        output = distance_forward(query, key, idx)
+        return output
+
+
+f_distance = distanceFunction.apply
+
+
 if __name__ == '__main__':
     b, c, h, w = 8, 3, 32, 32
     kH, kW = 5, 5

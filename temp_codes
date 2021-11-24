@@ -1,0 +1,15 @@
+        if (idx_B > -1 && idx_B < batch && idx_N > -1 && idx_N < Nquery && idx_K > -1 && idx_K < kernel){
+            const int idx_M = __ldg(&idx[idx_all]);
+            dtc val = dtc(0);
+            const dt *p_query = query + idx_B * Nquery * channels + idx_N * channels;
+            const dt *p_key = key + idx_B * Nkey * channels + idx_M * channels;
+            for (int c = 0; c < channels; ++c) {
+                val += static_cast<dtc> (__ldg(p_query) * __ldg(p_key));
+                p_query += 1;
+                p_key += 1;
+            }
+            val = sqrt(val / static_cast<dtc> (channels));
+            y[idx_all] = static_cast<dt> (val);
+        }
+
+删除之后再编译

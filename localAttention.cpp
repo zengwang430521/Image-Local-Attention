@@ -58,6 +58,15 @@ torch::Tensor weighting_backward_weight(
 }
 
 
+torch::Tensor distance_forward(
+        const torch::Tensor &query,
+        const torch::Tensor &key,
+        const torch::Tensor &idx) {
+    return distance_cuda_forward(
+            query, key, idx);
+}
+
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("similar_forward", &similar_forward,
             "similar_forward (CUDA)");
@@ -70,4 +79,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
             "weighting_backward_ori (CUDA)");
     m.def("weighting_backward_weight", &weighting_backward_weight,
             "weighting_backward_weight (CUDA)");
+
+    m.def("distance_forward", &distance_forward,
+        "distance_forward (CUDA)");
 }

@@ -39,4 +39,9 @@ torch::Tensor weighting_cuda_backward_weight(
         const int kH,
         const int kW);
 
+torch::Tensor distance_cuda_forward(
+        const torch::Tensor &query,
+        const torch::Tensor &key,
+        const torch::Tensor &idx);
+
 #endif //LOCALATTENTION_LOCALATTENTION_H
